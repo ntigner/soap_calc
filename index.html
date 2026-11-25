@@ -71,6 +71,12 @@ tr.sum td{font-weight:700;border-bottom:0}
  .orow{grid-template-columns:14px minmax(0,1fr) minmax(0,1fr) 44px;grid-template-areas:"s n n x" ". p w ."}
  .bigs{gap:6px}.bigs div{padding:10px 8px}.card{padding:16px}}
 [hidden]{display:none!important}
+.crow{display:grid;grid-template-columns:26px minmax(0,1fr) 96px 96px 44px;gap:8px 10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.crow .csw{width:26px;height:26px;border-radius:50%;border:1px solid rgba(0,0,0,.2)}
+.crow .cn b{display:block;font-weight:600}.crow .cn small{font-size:13px;color:var(--mute)}
+.crow .camt{grid-column:2/-1;font-size:14px;font-variant-numeric:tabular-nums}.crow .camt b{font-weight:700}
+.presets button .dotc{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px;border:1px solid rgba(0,0,0,.2)}
+@media(max-width:600px){.crow{grid-template-columns:26px minmax(0,1fr) minmax(0,1fr) 44px}.crow .cn{grid-column:2/4}.crow .x{grid-column:4;grid-row:1}.crow .ratef{grid-row:2;grid-column:2}.crow .ratef+.ratef{grid-column:3}.crow .camt{grid-row:3;grid-column:2/5}}
 .eorow{display:grid;grid-template-columns:minmax(0,1fr) 92px minmax(0,auto) 44px;gap:8px;align-items:center;margin-bottom:8px}
 .eorow .eg{font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}.eorow .eg small{display:block;color:var(--mute);font-size:12px}
 .eorow .eg.over{color:var(--coral);font-weight:700}
@@ -226,6 +232,12 @@ td.t{white-space:nowrap;font-weight:600;color:var(--olive)}
   </div>
  </section>
  <section class="card">
+  <h2>Colour <span style="font-weight:500;color:var(--mute);font-size:15px">(optional)</span></h2>
+  <div id="colpick"></div>
+  <div id="colrows"></div>
+  <p class="hint">Amounts are per pound of oils. "Part of batch" is for swirls: if a colour goes into a quarter of the batter, set it to 25%. Activated charcoal and kaolin clay are under Extras.</p>
+ </section>
+ <section class="card">
   <h2>Extras <span style="font-weight:500;color:var(--mute);font-size:15px">(optional)</span></h2>
   <div id="addpick"></div>
   <div id="addrows"></div>
@@ -318,13 +330,16 @@ td.t{white-space:nowrap;font-weight:600;color:var(--olive)}
    <li><b>Weigh everything first.</b> <span class="wrap v-wat"></span>, <span class="v-lye"></span> of <span class="v-lyen"></span>, <span class="v-oil"></span> of oils and fats<span class="wrap v-cat"></span><span class="v-slt"></span><span class="v-fot"></span>.</li>
    <li class="v-wstep"><b>Dissolve extras in the water.</b> Before adding the lye, stir <span class="wrap v-addw"></span> into the water until dissolved.</li>
    <li id="lyeStep"><b>Make the lye solution.</b> Slowly add the lye to the water, never water to lye, and stir until clear. It will fume and get very hot (up to about 200°F / 93°C). Don't breathe the fumes; leave it to cool somewhere safe.</li>
+   <li class="v-clstep"><b>Colour the lye solution.</b> Once the lye has dissolved, stir in <span class="wrap v-colL"></span> until there are no specks. Gel phase gives the deepest colour.</li>
    <li class="v-slstep"><b>Add sodium lactate.</b> Once the lye water is under 130°F (54°C), stir in <span class="v-sl"></span> of sodium lactate.</li>
    <li><b>Melt the oils.</b> Melt the hard oils and butters gently, then stir in the liquid oils, which also helps cool the mix.<span class="wrap v-addo"></span><span class="wrap v-liqo"></span></li>
+   <li class="v-cpstep"><b>Mix your colours.</b> <span class="wrap v-colP"></span> Whisk or use a mini mixer until there are no clumps.</li>
    <li><b>Match temperatures.</b> Let both cool to <span class="v-temp"></span>, within 10°F (5°C) of each other.<span class="wrap v-tempwhy"></span></li>
    <li><b>Combine.</b> Pour the lye water into the oils, pouring along the stick blender shaft to avoid bubbles. Alternate short pulses with stirring.</li>
    <li><b>Blend to trace.</b> Stop at light trace, when drizzled batter leaves a faint line on the surface, like thin pudding.</li>
    <li class="v-tstep"><b>Stir in extras.</b> At light trace, stir in <span class="wrap v-addt"></span> by hand, then pour soon: extras can thicken the batter.</li>
-   <li class="v-fostep"><b>Add fragrance and colour.</b> Stir in <span class="wrap v-fo"></span> by hand, plus any colourants.</li>
+   <li class="v-ctstep"><b>Add colour.</b> At light trace, <span class="wrap v-colT"></span></li>
+   <li class="v-fostep"><b>Add fragrance.</b> Stir in <span class="wrap v-fo"></span> by hand.</li>
    <li><b>Pour.</b> Pour into the mold, tap it on the counter to release air bubbles, and texture the top if you like.</li>
    <li><b>Insulate or chill.</b> Decide on gel or no gel (see above) and leave it undisturbed for 24–48 hours.</li>
    <li><b>Unmold and cut.</b> Unmold when it's firm (sodium lactate speeds this up) and cut into bars.</li>
@@ -417,6 +432,9 @@ function soapType(ok,tp){
  const rough=st.add.filter(x=>AD[x.id][2]==="Exfoliants"&&!AD[x.id][9]).map(x=>AD[x.id][1].replace(/ \(.*\)/,"").toLowerCase());
  if(rough.length)N.push(`${joinL(rough)[0].toUpperCase()+joinL(rough).slice(1)} ${rough.length>1?"are":"is"} too rough for faces or sensitive skin. Use oatmeal or jojoba beads for a face bar.`);
  if((LQ[st.liq]||LQ.water)[1])N.push(`${LQ[st.liq][0]} heats up as it saponifies. Don't insulate the mold: put it in the fridge or freezer for the first 24 hours to prevent cracking, browning and a soft gel ring.`);
+ if(st.col.some(x=>x.id==="mica"))N.push("Use micas sold as cold-process stable. Some blues, purples and pinks change colour or fade in fresh soap's high pH.");
+ if(st.col.some(x=>CO[x.id][12]))N.push("Natural colours soften and can fade in sunlight. Store bars out of direct light.");
+ if(st.col.some(x=>["indigo","madder"].includes(x.id)))N.push("Indigo and madder are brightest when the soap goes through gel phase, so insulate the mold (unless you're using milk or sugars).");
  const dv=(last.eop||[]).filter(p=>p.disc);if(dv.length)N.push(`${joinL(dv.map(p=>p.name.replace(/ \(.*\)/,"")))} contain${dv.length>1?"":"s"} vanillin, which turns soap tan to dark brown over 1–2 weeks. Plan your colours around it, or scent just part of the batch for a two-tone swirl.`);
  const ov=(last.eop||[]).filter(p=>p.over);if(ov.length)N.push(`${joinL(ov.map(p=>p.name))} ${ov.length>1?"are":"is"} over the safe maximum for soap. See the Scent section.`);
  const hs=["honey","sugar"].filter(k=>st.add.some(x=>x.id===k));if(hs.length)N.push(`${hs.length>1?"Honey and sugar heat":hs[0]==="honey"?"Honey heats":"Sugar heats"} soap up. Soap at 80–90°F (27–32°C) and skip insulating the mold.`);
@@ -430,7 +448,7 @@ function soapType(ok,tp){
 }
 const SAP={},COL={};OILS.forEach(o=>{SAP[o[0]]=o[1];COL[o[0]]=o[2]});
 const KR=56.106/39.997,OZ=28.349523,$=s=>document.querySelector(s),num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
-const DEF={mode:"mold",shape:"rect",unit:"in",L:10,W:3.5,D:3,H:2.5,cav:1,factor:0.40,oilWt:1000,oilUnit:"g",lye:"NaOH",purity:100,sf:5,fo:3,add:[],sl:2,smode:"fo",eo:[{id:"lav",p:60},{id:"ros",p:40}],ingStyle:"plain",ingFo:"",liq:"water",liqm:"all",ca:0,wm:"conc",conc:33,ratio:2,wpct:38,out:"g",
+const DEF={mode:"mold",shape:"rect",unit:"in",L:10,W:3.5,D:3,H:2.5,cav:1,factor:0.40,oilWt:1000,oilUnit:"g",lye:"NaOH",purity:100,sf:5,fo:3,add:[],col:[],sl:2,smode:"fo",eo:[{id:"lav",p:60},{id:"ros",p:40}],ingStyle:"plain",ingFo:"",liq:"water",liqm:"all",ca:0,wm:"conc",conc:33,ratio:2,wpct:38,out:"g",
  oils:[{n:"Olive oil",p:40},{n:"Coconut oil (76°)",p:25},{n:"Shea butter",p:20},{n:"Sweet almond oil",p:10},{n:"Castor oil",p:5}]};
 let st=structuredClone(DEF);
 try{const s=JSON.parse(localStorage.getItem("cpSoap")||"null");if(s&&Array.isArray(s.oils))st=Object.assign(st,s)}catch(e){}
@@ -509,9 +527,9 @@ function calc(){
  $("#tb").innerHTML=rows.join("");
  const conc=lye+wat>0?lye/(lye+wat)*100:0;
  $("#info").textContent=`Lye concentration ${conc.toFixed(1)}% · water : lye ${lye>0?(wat/lye).toFixed(2):"–"} : 1 · superfat ${s.sf}%`+(s.mode==="mold"?` · mold volume ${vol.toFixed(1)} ${s.unit}³`:"");
- recipeText=[`Cold process soap — ${fmt(total)} batch`,...s.oils.map((o,i)=>`${o.n} (${+o.p.toFixed(1)}%): ${fmt(ws[i])}`),`Total oils: ${fmt(oil)}`,`${ln}: ${fmt(lye,1)}`,...liqRows.map(([n,v])=>`${n}: ${fmt(v)}`),...(caG>0?[`Citric acid (${s.ca}%): ${fmt(caG,1)} (lye includes +${fmt(caLye,1)})`]:[]),...(window.__addReady?st.add.map(x=>`${AD[x.id][1]}: ${addAmt({...x}).txt}`):[]),...(sl>0?[`Sodium lactate (${s.sl}%): ${fmt(sl,1)}`]:[]),...(fo>0?(eop.length?eop.map(p=>`${p.name} essential oil (${p.pct.toFixed(2)}%): ${fmt(p.g,1)}`):[`Fragrance oil (${s.fo}%): ${fmt(fo)}`]):[]),`Superfat ${s.sf}%, lye concentration ${conc.toFixed(1)}%`,...(lastQ?[`Cure: ${lastQ.cure[0]}`]:[])].join("\n");
+ recipeText=[`Cold process soap — ${fmt(total)} batch`,...s.oils.map((o,i)=>`${o.n} (${+o.p.toFixed(1)}%): ${fmt(ws[i])}`),`Total oils: ${fmt(oil)}`,`${ln}: ${fmt(lye,1)}`,...liqRows.map(([n,v])=>`${n}: ${fmt(v)}`),...(caG>0?[`Citric acid (${s.ca}%): ${fmt(caG,1)} (lye includes +${fmt(caLye,1)})`]:[]),...(window.__addReady?st.add.map(x=>`${AD[x.id][1]}: ${addAmt({...x}).txt}`):[]),...(window.__addReady?st.col.map(x=>`${CO[x.id][1]}: ${colAmt(x).txt}${(x.part??100)<100?` (in ${x.part}% of batch)`:""}`):[]),...(sl>0?[`Sodium lactate (${s.sl}%): ${fmt(sl,1)}`]:[]),...(fo>0?(eop.length?eop.map(p=>`${p.name} essential oil (${p.pct.toFixed(2)}%): ${fmt(p.g,1)}`):[`Fragrance oil (${s.fo}%): ${fmt(fo)}`]):[]),`Superfat ${s.sf}%, lye concentration ${conc.toFixed(1)}%`,...(lastQ?[`Cure: ${lastQ.cure[0]}`]:[])].join("\n");
  last={oil,lye,wat,fo,sl,total,ws,conc,vol,ok,liqRows,caG,caLye,eop};
- if(typeof updAdd==="function"&&window.__addReady)updAdd();
+ if(typeof updAdd==="function"&&window.__addReady){updAdd();updCol()}
  drawMold(ok?tp:Math.max(tp,1));soapType(ok,tp);save();
 }
 function drawMold(tp){
@@ -589,6 +607,49 @@ $("#eoRows").addEventListener("input",e=>{const t=e.target;if(t.classList.contai
 $("#eoRows").addEventListener("click",e=>{const b=e.target.closest(".x");if(!b)return;st.eo.splice(+b.dataset.ei,1);eoActive=-1;drawEo();calc()});
 $("#eoAdd").addEventListener("click",()=>{const used=new Set(st.eo.map(x=>x.id));const f=EOS.find(e=>!used.has(e[0]))||EOS[0];const left=Math.max(0,100-st.eo.reduce((a,x)=>a+x.p,0));st.eo.push({id:f[0],p:left});eoActive=-1;drawEo();calc()});
 drawEo();
+// ---------- colour ----------
+// id, name, group, default tsp/lb, min, max, g per tsp, swatch, shade note, method (oil|water|lye), label, INCI, natural
+const COLS=[
+ ["mica","Mica (CP-stable)","Micas & pigments",1,.25,2,1.2,"linear-gradient(135deg,#c9a7e8,#7fc8d8,#e8c37f)","Any shade; shimmer softens in soap","oil","Mica","Mica",0],
+ ["tio2","Titanium dioxide","Micas & pigments",.5,.25,1,2.5,"#ffffff","Bright white; also brightens other colours","oil","Titanium Dioxide","Titanium Dioxide (CI 77891)",0],
+ ["oxide","Iron oxide","Micas & pigments",.25,.125,.5,2.5,"#a3472b","Red, yellow, brown or black; very strong","oil","Iron Oxides","Iron Oxides (CI 77491, CI 77492, CI 77499)",0],
+ ["ultra","Ultramarine","Micas & pigments",.25,.125,.5,2,"#3a4fd1","Blue, violet or pink; strong","water","Ultramarines","Ultramarines (CI 77007)",0],
+ ["chrom","Chromium oxide green","Micas & pigments",.25,.125,.5,3,"#4c7a3c","Muted green; very stable","oil","Chromium Oxide Green","Chromium Oxide Greens (CI 77288)",0],
+ ["rose","Rose clay","Natural",1,.5,2,2.5,"#e6a9a3","Soft pink to mauve","water","Rose Clay","Kaolin",1],
+ ["fgreen","French green clay","Natural",1,.5,2,2.5,"#9aa877","Sage to olive green","water","French Green Clay","Montmorillonite",1],
+ ["redmor","Red Moroccan clay","Natural",.75,.5,1,2.5,"#b4583c","Terracotta to rust","water","Red Moroccan Clay","Illite",1],
+ ["rhass","Rhassoul clay","Natural",1,.5,2,2.5,"#9b7b5c","Warm tan to brown","water","Rhassoul Clay","Moroccan Lava Clay",1],
+ ["indigo","Indigo powder","Natural",.25,.125,1,1.5,"#2b3f8c","Denim to deep blue; strong","lye","Indigo","Indigofera Tinctoria Leaf Powder",1],
+ ["madder","Madder root","Natural",1,.5,2,1.5,"#c65a5a","Pink to brick red; brighter with gel","oil","Madder Root","Rubia Tinctorum Root Powder",1],
+ ["annatto","Annatto seed","Natural",.5,.25,1,1.5,"#f0a030","Butter yellow to pumpkin orange","oil","Annatto","Bixa Orellana Seed Powder",1],
+ ["alkanet","Alkanet root","Natural",.5,.25,1,1.5,"#7a5a8c","Purple to grey-purple","oil","Alkanet Root","Alkanna Tinctoria Root Powder",1],
+ ["turmeric","Turmeric","Natural",.25,.125,.5,2.5,"#e8b62c","Golden yellow; more turns it brown","oil","Turmeric","Curcuma Longa (Turmeric) Root Powder",1],
+ ["paprika","Paprika","Natural",1,.5,2,2.3,"#e48a62","Peach to salmon; slightly speckled","oil","Paprika","Capsicum Annuum Fruit Powder",1],
+ ["cocoa","Cocoa powder","Natural",1,.5,2,2,"#7a4a2e","Tan to chocolate brown","oil","Cocoa Powder","Theobroma Cacao (Cocoa) Seed Powder",1],
+ ["spir","Spirulina","Natural",1,.5,2,2,"#4f8a5b","Green that fades to olive over months","oil","Spirulina","Spirulina Platensis Powder",1]];
+const CO=Object.fromEntries(COLS.map(c=>[c[0],c]));
+const colAmt=x=>{const c=CO[x.id],t=x.r*lbOil()*((x.part??100)/100);return{t,txt:meas(t),g:t*c[6]}};
+function drawColPick(){const on=new Set(st.col.map(x=>x.id));
+ $("#colpick").innerHTML=["Micas & pigments","Natural"].map(g=>`<div class="agrp"><p>${g}</p><div class="presets">${COLS.filter(c=>c[2]===g).map(c=>`<button data-c="${c[0]}" aria-pressed="${on.has(c[0])}"><span class="dotc" style="background:${c[7]}"></span>${c[1]}</button>`).join("")}</div></div>`).join("")}
+function drawColRows(){$("#colrows").innerHTML=st.col.map((x,i)=>{const c=CO[x.id];return`<div class="crow"><span class="csw" style="background:${c[7]}"></span><div class="cn"><b>${c[1]}</b><small>${c[8]}</small></div><label class="ratef"><input type="number" inputmode="decimal" step="0.125" min="${c[4]}" max="${c[5]}" value="${x.r}" data-ci="${i}" data-cf="r" aria-label="${c[1]} teaspoons per pound of oils"><span>tsp/<br>lb oil</span></label><label class="ratef"><input type="number" inputmode="numeric" step="5" min="5" max="100" value="${x.part??100}" data-ci="${i}" data-cf="part" aria-label="Percent of batch coloured"><span>% of<br>batch</span></label><button class="x" data-ci="${i}" aria-label="Remove ${c[1]}">×</button><div class="camt" id="ca${i}"></div></div>`}).join("")}
+const cnm=c=>c[1].replace(/ \(.*\)/,"").toLowerCase();
+const disp=(x,m)=>{const c=CO[x.id];return c[9]==="water"?`${m.txt} ${cnm(c)} in about the same amount of distilled water`:`${m.txt} ${cnm(c)} in ${meas(m.t*3)} of a light liquid oil such as sweet almond or sunflower`};
+function updCol(){
+ st.col.forEach((x,i)=>{const e=$("#ca"+i);if(e){const m=colAmt(x),c=CO[x.id];e.innerHTML=`Use <b>${m.txt}</b> (≈ ${m.g<10?m.g.toFixed(1):Math.round(m.g)} g)${(x.part??100)<100?` in ${x.part}% of the batter`:""}. ${c[9]==="lye"?"Stir it into the cooled lye solution.":`Mix into ${c[9]==="water"?"a little distilled water":"a little light oil"} first, add at light trace.`}`}});
+ const L=st.col.filter(x=>CO[x.id][9]==="lye"),P=st.col.filter(x=>CO[x.id][9]!=="lye");
+ document.querySelectorAll(".v-colL").forEach(e=>e.textContent=joinL(L.map(x=>`${colAmt(x).txt} ${cnm(CO[x.id])}`)));
+ document.querySelectorAll(".v-clstep").forEach(e=>e.hidden=!L.length);
+ document.querySelectorAll(".v-colP").forEach(e=>e.textContent=P.length?`Disperse ${joinL(P.map(x=>disp(x,colAmt(x))))}.`:"");
+ document.querySelectorAll(".v-cpstep").forEach(e=>e.hidden=!P.length);
+ const part=P.some(x=>(x.part??100)<100);
+ document.querySelectorAll(".v-colT").forEach(e=>e.textContent=P.length?`${part?"pour off the portions you're colouring, then ":""}stir each dispersed colour into its batter until even. ${part?"Pour in layers or swirl.":""}`:"");
+ document.querySelectorAll(".v-ctstep").forEach(e=>e.hidden=!P.length);
+}
+$("#colpick").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const id=b.dataset.c,i=st.col.findIndex(x=>x.id===id);
+ if(i>=0)st.col.splice(i,1);else st.col.push({id,r:CO[id][3],part:100});drawColPick();drawColRows();calc()});
+$("#colrows").addEventListener("input",e=>{const t=e.target;if(t.dataset.ci!==undefined&&t.matches("input")){st.col[+t.dataset.ci][t.dataset.cf]=num(t.value);calc()}});
+$("#colrows").addEventListener("click",e=>{const b=e.target.closest(".x");if(!b)return;st.col.splice(+b.dataset.ci,1);drawColPick();drawColRows();calc()});
+drawColPick();drawColRows();
 // ---------- extras ----------
 // id, name, group, default tsp per lb oils, min, max, grams per tsp, strength, when (w=water, o=oils, t=trace), face-safe, note
 const ADD=[
@@ -660,6 +721,7 @@ function sheetData(){
  const extra=[[`Lye (${s.lye}${s.purity<100?`, ${s.purity}% pure`:""})`,"",g(L.lye,1),o(L.lye)],...L.liqRows.map(([n,v])=>[n,"",g(v),o(v)])];
  if(L.caG>0)extra.push([`Citric acid (lye includes +${g(L.caLye,1)})`,`${s.ca}%`,g(L.caG,1),o(L.caG)]);
  st.add.forEach(x=>{const m=addAmt(x);extra.push([`${AD[x.id][1]} (${m.txt})`,"",`≈ ${m.g<10?m.g.toFixed(1):Math.round(m.g)} g`,`≈ ${(m.g/OZ).toFixed(2)} oz`])});
+ st.col.forEach(x=>{const m=colAmt(x);extra.push([`${CO[x.id][1]} (${m.txt}${(x.part??100)<100?`, ${x.part}% of batch`:""})`,"",`≈ ${m.g<10?m.g.toFixed(1):Math.round(m.g)} g`,`≈ ${(m.g/OZ).toFixed(2)} oz`])});
  if(L.sl>0)extra.push(["Sodium lactate (60%)",`${s.sl}%`,g(L.sl,1),o(L.sl)]);
  if(L.fo>0){if(L.eop&&L.eop.length)L.eop.forEach(p=>extra.push([`${p.name} essential oil`,`${p.pct.toFixed(2)}%`,g(p.g,1),o(p.g)]));else extra.push(["Fragrance oil",`${s.fo}%`,g(L.fo),o(L.fo)])}
  const temps=[...document.querySelectorAll(".howto tbody tr")].map(tr=>[...tr.cells].map(c=>c.textContent));
@@ -743,7 +805,8 @@ function ingList(style){
  if(L.fo>0){if(L.eop&&L.eop.length)L.eop.forEach(p=>push(p.label||`${tcase(p.name.replace(/ \(.*\)| \d+-fold/g,""))} Essential Oil`,p.inci,p.g));else{const f=(s.ingFo||"").trim();push(f||"Fragrance",f||"Fragrance (Parfum)",L.fo)}}
  s.add.forEach(x=>{const m=addAmt(x),n=ADI[x.id]||[AD[x.id][1],AD[x.id][1]];push(n[0],n[1],m.g)});
  it.sort((a,b)=>b.w-a.w);
- return it.map(x=>x.n).join(", ")+".";
+ const cl=[];st.col.forEach(x=>{const c=CO[x.id],n=inci?c[11]:c[10];if(!cl.includes(n))cl.push(n)});
+ return it.map(x=>x.n).concat(cl).join(", ")+".";
 }
 const SN={plain:"Everything as it goes into the pot, heaviest first. Plain names are easiest for customers to read.",inci:"The same order, using the standard international cosmetic ingredient (INCI) names that many shops and stockists expect.",sap:"Describes the finished bar: the lye is used up turning oils into soap, and glycerin forms naturally. Heaviest first."};
 function renderIng(){$("#ingFo").closest("label").hidden=st.smode==="eo";$("#ingOut").textContent=ingList(st.ingStyle);$("#ingStyleNote").textContent=SN[st.ingStyle]||"";$("#ingFo").value=st.ingFo||"";$("#ingMsg").textContent=""}
@@ -784,7 +847,7 @@ $("#rsave").addEventListener("click",async()=>{const name=$("#rname").value.trim
 $("#rname").addEventListener("keydown",e=>{if(e.key==="Enter")$("#rsave").click()});
 $("#rlist").addEventListener("click",async e=>{const b=e.target.closest("button");if(!b)return;
  if(b.dataset.load){const r=recipes.find(x=>x.id===b.dataset.load);if(!r)return;st=Object.assign(structuredClone(DEF),JSON.parse(JSON.stringify(r.st)));curId=r.id;delArm=null;$("#rname").value=r.name;active=-1;
-  sync();drawRows();drawAddPick();drawAddRows();drawPresets();drawEo();calc();rmsg(`Loaded “${r.name}”.`);renderRecipes();return}
+  sync();drawRows();drawAddPick();drawAddRows();drawPresets();drawEo();drawColPick();drawColRows();calc();rmsg(`Loaded “${r.name}”.`);renderRecipes();return}
  if(b.dataset.del){const id=b.dataset.del;if(delArm!==id){delArm=id;renderRecipes();return}
   try{await store.del(id);recipes=recipes.filter(x=>x.id!==id);if(curId===id)curId=null;rmsg("Recipe deleted.")}catch(e){rmsg("Couldn't delete right now.")}delArm=null;renderRecipes()}});
 $("#raddlog").addEventListener("click",async()=>{const r=recipes.find(x=>x.id===curId),t=$("#rnote").value.trim();if(!r||!t)return;
